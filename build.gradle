@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+}
+
+group 'qa.guru'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation(
+            'org.junit.jupiter:junit-jupiter:5.8.2',
+            'org.slf4j:slf4j-simple:1.7.36',
+            'io.rest-assured:rest-assured:5.1.1',
+            'com.google.code.gson:gson:2.9.0',
+            'org.assertj:assertj-core:3.23.1',
+            'org.projectlombok:lombok:1.18.24'
+    )
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Test) {
+    systemProperties(System.getProperties())
+    useJUnitPlatform()
+
+    if (System.getProperty("threads") != null) {
+        systemProperties += [
+                'junit.jupiter.execution.parallel.enabled'                 : true,
+                'junit.jupiter.execution.parallel.mode.default'            : 'concurrent',
+                'junit.jupiter.execution.parallel.classes.default'         : 'concurrent',
+                'junit.jupiter.execution.parallel.config.strategy'         : 'fixed',
+                'junit.jupiter.execution.parallel.config.fixed.parallelism': System.getProperty("threads").toInteger(),
+        ]
+    }
+
+    testLogging {
+        lifecycle {
+            events "STARTED", "PASSED", "SKIPPED", "FAILED", "STANDARD_OUT", "STANDARD_ERROR"
+            exceptionFormat "short"
+        }
+    }
+}
